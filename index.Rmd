@@ -1,0 +1,31 @@
+---
+title: 'Factores determinantes de las trayectorias de deserción permanente en educación superior: El efecto de las ayudas financieras estatales y la política de gratuidad'
+subtitle: "Tesis para optar al grado de Socióloga"
+author: "Catalina F. Miranda Castillo"
+date: "Octubre, 2022" # o para fecha actual: "`r Sys.Date()`"
+institution: "Universidad de Chile"
+degree: "Seminario de Título - Carrera de Sociología"
+advisor: "Profesor guía: Juan C. Castillo V."
+bibliography: [tesis.bib]
+biblio-style: apalike
+link-citations: yes
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+fontsize: 14pt
+lof: True
+lot: True
+
+---
+
+
+# Resumen {-}
+
+El sistema de educación superior chileno ha experimentado profundas transformaciones durante las últimas décadas. Una de ellas es la considerable expansión en términos de cobertura, que ha sido en gran parte posibilitada por la ampliación y diversificación de las ayudas financieras -becas y créditos- provistas por parte del Estado. Sin embargo, los avances en materia de acceso no vinieron acompañados de la generación de condiciones que favorezcan la retención y la permanencia, persistiendo aún elevadas tasas de deserción en el sistema. En este escenario, la presente investigación se centrará en la cohorte de ingreso a primer año del año 2016, con el fin de indagar en el efecto que las ayudas financieras estatales anteriormente mencionadas -en particular la reciente política de gratuidad- tienen sobre la probabilidad de abandonar permanentemente los estudios superiores durante el primer año. Como hipótesis principales, se plantea que los estudiantes beneficiados con el Crédito con Garantía Estatal (CAE) presentarían una menor probabilidad de desertar en comparación con aquellos beneficiarios del Fondo Solidario de Crédito Universitario (FCSU), así como también con quienes cuentan con gratuidad. Se trabajará con datos provenientes de diversas fuentes estadísticas de educación superior de organismos estatales entre los años 2016 y 2020, se clasificará a los estudiantes en función de sus trayectorias académicas y, finalmente, se construirán modelos de regresiones logísticas para evaluar el efecto que las diferentes ayudas económicas tienen sobre la probabilidad de ocurrencia del fenómeno. 
+
+**Palabras clave**: deserción, trayectorias, educación superior, ayudas financieras estatales
+
+
+# Agradecimientos {-}
+
+*Agradecimientos aquí.*

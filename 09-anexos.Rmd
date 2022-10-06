@@ -1,0 +1,52 @@
+# Anexos
+
+```{r, results='asis', echo=FALSE}
+Tramo <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+Desde <- c("0", "$144.001", "$288.001", "$432.001", "$576.001", 
+           "$720.001", "$864.001", "$1.008.001", "$1.152.001",
+           "$1.296.001", "$1.440.001", "$1.584.001")
+Hasta <- c("$144.000", "$288.000", "$432.000", "$576.000", 
+           "$720.000", "$864.000", "$1.008.000", "$1.152.000", 
+           "$1.296.000", "$1.440.000", "$1.584.000", "o más")
+ingreso_tramos <- data.frame(Tramo, Desde, Hasta)
+
+ingreso_tramos %>%
+  knitr::kable("html",
+               caption = "Anexo I: Tramos de Ingreso Bruto",
+               align = c("c", "l", "l")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+
+```{r, results='asis', echo=FALSE}
+sigla <- c("BBIC", "BEA", "BET", "BHPE", "BJGM", "BJGME", "BNM",
+           "BNA", "BNM II", "BNM III", "BPSU", "BVP", "CAE", "FSCU",
+           "GRATUIDAD", "TRASPASO")
+descripcion <- c("Beca Bicentenario", "Beca de Excelencia Académica", "Beca de Excelencia Técnica", "Beca Hijo de Profesionales de la Educación", "Beca Juan Goméz Millas", "Beca Juan Gómez Millas para Extranjeros", "Beca Nuevo Milenio", "Beca de Nivelación Académica", "Beca Nuevo Milenio II", "Beca Nuevo Milenio III", "Beca Puntaje PSU", "Beca Vocación de Profesor", "Crédito con Garantía Estatal", "Fondo Solidario de Crédito Universitario", "Gratuidad", "Beca Valech Traspaso")
+bcg <- data.frame(sigla, descripcion)
+
+bcg %>%
+  knitr::kable("html",
+               caption = "Anexo II: Becas, Créditos y Gratuidad",
+               align = c("l", "l"),
+               col.names = c("Sigla", "Descripción")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

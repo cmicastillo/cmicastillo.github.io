@@ -1,0 +1,373 @@
+# Resultados descriptivos
+
+```{r load-packages, echo=FALSE, include=FALSE}
+library(magrittr)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(sjlabelled)
+library(sjmisc)
+```
+
+# Resultados descriptivos {#descriptivos}
+
+En tanto el presente análisis se centra en el seguimiento de las trayectorias de los estudiantes, conviene partir por la observación del panorama al momento del ingreso. Así, de los 180.792 estudiantes que conforman la cohorte de ingreso 2016 en esta investigación, se aprecia que optaron mayoritariamente por matricularse en el sector universitario (67,3%) en desmedro del sector técnico-profesional (32,7%). Sin embargo, dicha incorporación masiva a las universidades se encuentra segmentada por tipo de institución, siendo las universidades privadas las que concentran la mayor cantidad de matriculados (30,21%), seguidas por las entidades estatales (20,17%) y las denominadas “universidades del G9” (16,92%). A partir de estos resultados, es posible notar dos elementos de importancia: en primer lugar, el enorme terreno que ha ido ganando el grupo conformado por los CFTs e IPs, en tanto supera cuantitativamente la matrícula de cada tipo de institución universitaria por separado; y en segundo lugar, el retroceso que han experimentado las universidades tradicionales en el país, siendo superadas en número de matrícula, por un margen no menor, por las instituciones creadas a partir de la privatización de la educación superior en 1981. 
+
+```{r, results='asis', echo=FALSE}
+nombres <- c("Universidades privadas", "Universidades estatales", "Universidades del G9", "CFTs e IPs", "Total")
+vals <- c("54.615", "36.457", "30.597", "59.123", "180.792")
+porc <- c("30,21%", "20,17%", "16,92%", "32,7%", "100%")
+frq_cum <- c("30,21%", "50,38%", "67,3%", "100%", "100%")
+freq_tipo_inst <- data.frame(nombres, vals, porc, frq_cum)
+
+freq_tipo_inst %>%
+  knitr::kable("html",
+               caption = "Número y porcentaje de estudiantes que ingresaron el año 2016 por tipo de institución",
+               col.names = c(" ", "N", "%", "% acumulado"),
+               align = c("l", "c", "c", "c")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::row_spec(5, background = "#E6E0EC", bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = TRUE) %>%
+  kableExtra::footnote(c("Elaboración propia a partir de información pública entregada por el SIES"))
+```
+
+Otro aspecto relativo al acceso a la educación superior a tomar en cuenta para los fines de este estudio refiere a los beneficios que les fueron asignados a los estudiantes al momento de su ingreso a primer año. A continuación se presenta una matriz en la que es posible consultar información general sobre el tipo de ayuda financiera que les fue entregada -siendo el Ministerio de Educación (MINEDUC) y la Comisión Ingresa las dos entidades proveedoras posibles-, así como también sobre el número de estudiantes que se vieron beneficiados y quienes obtuvieron uno u otro tipo de beneficio. Uno de los resultados que destaca a partir de esta observación es que solo un 27,3% de ellos no fue destinatario de ningún tipo de ayuda, existiendo, como contraparte, poco más de un 70% de estudiantes que sí cuenta con apoyo estatal para el financiamiento de sus estudios. Se observa, además, una amplia prevalencia cuantitativa de beneficios entregados por el MINEDUC (64,1%) por sobre las asignaciones del CAE (23,2%). Estas cifras, sumadas al 14,6% del total de estudiantes que debe recurrir a una complementación de beneficios para poder cubrir los elevados aranceles de los programas de estudio, confirman el rol esencial que han asumido las ayudas financieras en tanto han facilitado el acceso a la educación terciaria a los sectores menos favorecidos.
+
+```{r, results='asis', echo=FALSE}
+col_CAE <- c("Cuenta con CAE", "No cuenta con CAE", "Total")
+col_2 <- c("26.393 (14,6%)", "89.488 (49,5%)", "115.881 (64,1%)")
+col_3 <- c("15.565 (8,6%)", "49.346 (27,3%)", "64.911 (35,9%)")
+col_4 <- c("41.958 (23,2%)", "138.834 (76,8%)", "180.792 (100%)")
+mat_conf <- data.frame(col_CAE, col_2, col_3, col_4)
+
+mat_conf %>%
+  knitr::kable("html",
+               caption = "Tabla 6: Número y porcentaje de estudiantes que cuentan con determinado tipo de ayuda estatal",
+               align = c("l", "c", "c", "c"),
+               col.names = c(" ", "Cuenta con beneficio MINEDUC", "No cuenta con beneficio MINEDUC", "Total")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::column_spec(1, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::footnote(c("Elaboración propia a partir de información entregada por el SIES y Comisión Ingresa"))
+```
+
+Pero si bien la tabla anterior deja en evidencia la superioridad cuantitativa de los beneficios otorgados por el Estado en relación con las asignaciones del CAE, estas cifras esconden la importancia que tiene cada uno por separado. Al observar el siguiente gráfico, que muestra la distribución de cada ayuda según cantidad de beneficiarios pertenecientes a la cohorte de ingreso 2016, salta inmediatamente a la vista la mayor relevancia de la gratuidad, beneficiando a poco más de 40.000 personas (aproximadamente el 37% del total de beneficiarios de ayudas estatales) el mismo año de su implementación. El segundo beneficio con mayor cantidad de asignaciones es la Beca Nuevo Milenio (BNM) que, en sus tres versiones, alcanza un total de 28.901 beneficiarios (25% del total), e implica una importante cobertura en el arancel de estudiantes matriculados en carreras del sector técnico-profesional. 
+
+```{r plotsaved, echo=FALSE, out.width='85%', fig.cap="Cantidad de beneficiarios de ayudas entregadas por el MINEDUC según tipo de beneficio", fig.align='center'}
+
+enes_becas <- c(7374, 5649, 2468, 1576, 79, 18364, 3352, 28901, 4, 1333, 3505, 42978, 298)
+labels_becas <- c("BBIC", "BEA", "BET", "BHPE", "BJGME", "BJGM", "BNA", "BNM(I, II y III)", "BPSU", "BVP", "FSCU", "GRATUIDAD", "TRASPASO")
+n_becas <- data.frame(enes_becas, labels_becas)
+
+ggplot2::ggplot(n_becas, aes(x=labels_becas, y=enes_becas)) +
+  ggplot2::geom_segment(aes(x=labels_becas, xend = labels_becas, y = 0, yend = enes_becas), color = "grey") +
+  ggplot2::geom_point(size = 4, color = "blue", alpha = 0.6) + 
+  ggplot2::theme_light() + 
+  ggplot2::theme(
+    panel.grid.major.y = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  ggplot2::coord_flip() +
+  ggplot2::xlab("Tipo de beneficio estatal") + 
+  ggplot2::ylab("Cantidad de beneficiarios") +
+  ggplot2::ggtitle("Cantidad de beneficiarios según tipo de beneficio estatal") + 
+  ggplot2::labs(caption = "Elaboración propia a partir de información entregada por el SIES")
+
+```
+
+\newpage
+
+## Trayectorias de persistencia continua 
+
+Cubierto lo anterior, cabe preguntarse por la situación de la cohorte en relación con su persistencia al interior del sistema de educación superior. En la siguiente tabla es posible visualizar el número y porcentaje de estudiantes de la cohorte de análisis que se matriculó continuamente año a año, sea a nivel sistema, a nivel de tipo de institución o a nivel institución. En primer lugar, cabe destacar que no se aprecian diferencias significativas entre los tres niveles, existiendo un porcentaje levemente menor de persistencia a nivel de institución y de tipo de institución en comparación a la persistencia en el sistema en el transcurso de los años posteriores al ingreso. Así, y en consonancia con lo identificado por la literatura, se observa una tasa de persistencia de 78% del primer al segundo año en todos los niveles, siendo este el período en que se registra un mayor porcentaje de abandono entre un año y otro (más de 20 puntos porcentuales). La segunda caída importante se registra entre el tercer y cuarto año (15,3%), donde solo la mitad de la cohorte original se mantiene continuamente matriculada en todos los niveles desde su ingreso al sistema. Estos años son, también, donde se observa una mayor variación entre los tres niveles de análisis. Pese a no ser demasiado significativa, esta diferencia puede estar indicando un mayor desplazamiento entre instituciones durante el tercer y el cuarto año en relación con los demás años.
+
+
+```{r results='asis', echo=FALSE}
+
+anio_persist_cont <- c("2016", "2017", "2018", "2019", "2020")
+persist_sist <- c("180.792 (100%)", "142.679 (78,9%)", "121.191 (67%)", "93.434 (51,7%)", "73.860 (40,9%)")
+persist_tipo_inst <- c("180.792 (100%)", "142.016 (78,6%)", "119.821 (66,3%)", "91.758 (50,8%)", "72.861 (40,3%)")
+persist_inst <- c("180.792 (100%)", "141.291 (78,2%)", "117.775 (65,1%)", "89.809 (49,7%)", "71.966 (39,9%)")
+
+persistencia <- data.frame(anio_persist_cont, persist_sist, persist_tipo_inst, persist_inst)
+
+persistencia %>%
+  knitr::kable("html",
+               caption = "Número y porcentaje de estudiantes de la cohorte 2016 que se matricularon continuamente a nivel sistema, tipo de institución e institución por año",
+               align = c("l", "c", "c", "c"),
+               col.names = c("Año", "Nivel sistema", "Nivel tipo de institución", "Nivel institución")) %>%
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::column_spec(1, background = "#E6E0EC") %>%
+  kableExtra::footnote(general = "Elaboración propia a partir de información entregada por el SIES")
+
+```
+
+## Trayectorias de reingreso
+
+Respecto de las trayectorias de reingreso, se establecieron también distintos niveles, a fin de conocer si el estudiante volvía a incorporarse al sistema, al mismo tipo de institución o a la misma institución tras un período de abandono transitorio. Como se mencionó anteriormente, el análisis de reingreso comprende un período máximo de 2 años de ausencia de matrícula en el sistema, de modo que se considerará como reingresante a todo estudiante de la cohorte 2016 que: i) no se haya matriculado en ninguna institución durante el año 2017 y se haya reincorporado al sistema el año 2018 (abandono transitorio de un año); y ii) que no se haya matriculado en ninguna institución durante los años 2017 y 2018, y se haya reincorporado al sistema el año 2019 (abandono transitorio de dos años). 
+
+A continuación se presentan las cifras referentes a ambos tipos de reingreso. Como era de esperarse, el número de estudiantes que reingresa a nivel sistema es mayor a los demás niveles para las dos formas de reingreso, en tanto no se exige que el estudiante vuelva a matricularse en un tipo de institución o institución determinada. Por otro lado, se aprecia que la mayor cantidad de reingresantes se concentra tras haber transcurrido un año de abandono transitorio, constituyendo más del 80% del total de reingresantes. Pese a ello, la proporción de estudiantes que retoma sus estudios tras haber abandonado el sistema transitoriamente se mantiene bajo el 10%, situación que dista bastante en relación con lo reportado por investigaciones similares. En este sentido, se considera que la razón de ello se encuentra en que el presente análisis solo comprende a la porción de estudiantes que no registran matrícula entre el segundo y tercer año desde su ingreso, excluyendo, por ejemplo, los abandonos que puedan registrarse durante el año académico (ya habiéndose matriculado), o aquellos que se presentan en años posteriores a los que abarca esta investigación. 
+
+```{r results='asis', echo=FALSE}
+niveles <- c("Nivel sistema", "Nivel tipo de institución", "Nivel institución", "Nivel sistema", "Nivel tipo de institución", "Nivel institución", "Nivel sistema", "Nivel tipo de institución", "Nivel institución")
+n_niveles <- c("1.977", "1.782", "1.654", "473", "358", "306", "2.450", "2.140", "1.960")
+
+reingreso <- data.frame(niveles, n_niveles)
+
+reingreso %>%
+  knitr::kable("html", 
+               align = c("l", "c"),
+               col.names = c("Niveles", "N° reingresantes"),
+               caption = "Número de reingresantes tras uno y dos años de abandono transitorio según niveles") %>%
+  kableExtra::kable_styling(full_width = TRUE) %>%
+  kableExtra::pack_rows(index = c("Reingreso tras 1 año" = 3, "Reingreso tras 2 años" = 3, "Total de reingresantes" = 3)) %>%
+  kableExtra::footnote(c("Elaboración propia a partir de información entregada por el SIES"))
+
+```
+
+## Trayectorias de abandono permanente
+
+Finalmente, en la siguiente tabla se presentan tanto el número como el porcentaje de estudiantes pertenecientes a la cohorte 2016 que no se matricularon continuamente cada año a contar desde su ingreso; en otras palabras, entran dentro de esta categoría quienes, no habiéndose matriculado en un año determinado, tampoco registran matrícula al año siguiente. Como se ha señalado previamente, se permitió la ausencia de matrícula por un período máximo de 2 años tras el año de ingreso, considerando que, de acuerdo con la literatura, existiría una importancia fracción de estudiantes que retomaría sus estudios al tercer año desde su abandono. De esta manera, si bien en la tabla figura el total de cifras de abandono durante todos los años comprendidos en el estudio, se destacaron el número y porcentaje de estudiantes considerados como desertores permanentes, que corresponderían a la fracción de la cohorte que no retornó habiendo transcurrido dicho plazo. Cabe mencionar, también, que dado que el foco de interés está centrado en el grupo que abandona de manera permanente el sistema de educación superior en su totalidad, se optó por establecer únicamente un seguimiento de los MRUN a nivel sistema, de modo que se excluyeron los análisis relativos a la institución en que se encontraban matriculados los estudiantes.  
+
+En términos generales, se aprecia la misma tendencia constatada a partir de la observación de las tasas de persistencia: la principal caída en la matrícula se registra entre el primer y el segundo año, donde poco más del 20% de la cohorte no regresa para un segundo período. En tal sentido, las variaciones más relevantes se producen al cuarto y quinto año desde el ingreso de la cohorte, donde el porcentaje de deserción -que, a estas alturas, ya se considera permanente- se amplía hasta alcanzar un 28%. En este punto, resulta interesante mencionar que, a pesar de que las cifras de persistencia acusan una disminución de aproximadamente la mitad del total de estudiantes que componen al grupo estudiado, el porcentaje de desertores del sistema no supera la barrera del 30%, al menos en lo que respecta a estudiantes que abandonan sus estudios entre el primer y el segundo año. Se reconoce, sin embargo, la especificidad de las definiciones en el presente estudio, en la medida que no incorpora en los análisis a quienes hayan desertado de forma definitiva, por ejemplo, entre el segundo y el tercer o el cuarto año, lo cual seguramente habría configurado un perfil de desertor distinto al que aquí se expone.  
+
+```{r results='asis', echo=FALSE}
+
+anio_des <- c("2016", "2017", "2018", "2019", "2020")
+no_matric <- c("--", "38.171 (21,1%)", "38.261 (21,2%)", "42.004 (23,2%)", "50.514 (28%)")
+
+des_per <- data.frame(anio_des, no_matric)
+
+des_per %>%
+  knitr::kable("html", align = c("c", "c"),
+               col.names = c("Año", "N y % no matriculados"),
+               caption = "Número y porcentaje de no matriculados continuamente por año") %>%
+  kableExtra::kable_styling(full_width = TRUE) %>%
+  kableExtra::row_spec(4:5, bold = T, background = "#E6E0EC") %>%
+  kableExtra::footnote(c("Elaboración propia a partir de información entregada por el SIES"))
+
+```
+
+### Análisis bivariados según variables independientes
+
+En la presente sección se procederá a analizar la deserción permanente en función de los tres conjuntos de variables independientes, vinculados a las dimensiones académica, institucional y demográfica-socioeconómica respectivamente. Si bien estas dimensiones se han presentado en tal orden a lo largo de todo el escrito, se resolvió llevar a cabo la exploración de asociaciones siguiendo una lógica coherente con las hipótesis planteadas en esta investigación. De esta manera, se comenzará con las variables demográficas y socioeconómicas, enfatizando en la relación entre deserción y ayudas económicas, para luego ahondar en la dimensión académica y, finalmente, en la dimensión institucional.
+
+#### Deserción permanente según variables demográficas y socioeconómicas
+
+La tabla *a continuación* ilustra la distribución del grupo de desertores permanentes en función de: i) el sexo/género de los estudiantes; ii) el nivel educacional más alto alcanzado por su madre; iii) el tramo de ingreso en que se encuentra su hogar (ver Anexo I); y iv) el tipo de ayuda económica con el que cuentan, que comprende los beneficios entregados por el MINEDUC y el CAE.  
+
+A partir de la información desplegada en la tabla, es posible concluir, en primer lugar, que el grupo de desertores tiene una composición levemente más masculina que femenina. En términos de sus características familiares, se observa que el grado de escolaridad de la madre se concentra marcadamente en el tercer tramo, indicando que el máximo nivel alcanzado por esta no va más allá de la enseñanza media. Respecto de esta misma variable, resulta importante resaltar, también, que en poco más del 10% de los desertores, sus madres no superaron el nivel básico de enseñanza. Esta situación se pone aún más cuesta arriba si se considera la distribución del grupo en función de los ingresos percibidos por el hogar, que asume una forma asimétrica y pronunciada hacia los tramos de menor ingreso. Tal ordenamiento de los datos permite apreciar de mejor manera algunas medidas de tendencia central que vale la pena destacar. Por un lado, el 50% de los desertores cuenta con un ingreso bruto familiar igual o menor a $432.000, mientras que la mitad restante se distribuye, en grupos mucho más reducidos, a lo largo de los tramos de mayor ingreso. Por otro lado, pese a que la curva muestra una inclinación evidente hacia los tramos de bajos ingresos, la media se ubica por sobre la mediana, lo cual se relaciona con el grupo de valores atípicos que se encuentra a la derecha de la distribución, específicamente en el tramo de mayor ingreso. En lo que respecta a estos valores, se estima necesario indagar más en la razón subyacente a su posición antes de clasificarlos como eventos anormales, en tanto podría estar indicando un comportamiento distintivo de los estratos más aventajados en términos de ingresos. 
+
+Finalmente, y en directa relación con las hipótesis principales de esta investigación, conviene describir cómo se distribuyen los datos según el tipo de ayuda económica recibida. Un primer resultado a subrayar es que solo el 36,8% de los desertores no recibió ningún tipo de apoyo arancelario de parte del MINEDUC, existiendo más de un 60% que optó por abandonar sus estudios superiores aun contando con alguna ayuda económica. Siguiendo la tendencia de los resultados generales, la gratuidad se erige, también en este grupo, como el beneficio con mayor número de asignaciones, constituyendo cerca del 30% del 60% anteriormente mencionado. En contraposición, el panorama se invierte completamente en el caso de las asignaciones del CAE, donde la mayor cantidad de observaciones se concentra en la ausencia del beneficio, y únicamente un 17,4% de los beneficiarios desertó de forma permanente a pesar de contar con el crédito. De esta manera, los resultados descriptivos en relación con la primera hipótesis propuesta (*H.I.*) parecen ser ambivalentes; si bien la asignación de una ayuda económica se presenta como un factor importante en la decisión de desertar, al parecer no da lo mismo el tipo de apoyo con el que se cuenta, habiendo una inclinación en favor del CAE en desmedro de las becas, la gratuidad y el FSCU. Este último resultado es consistente con la segunda hipótesis del estudio (*H.II.*), así como también con la literatura, lo que corroboraría la relevancia del CAE en relación con los compromisos económicos que deben asumir las familias que acuden a este beneficio.
+
+```{r load DES_2016_a_2019, echo=FALSE, results='asis'}
+
+load("C:/Users/hzcat/Desktop/seminario/BBDD/gitbooks/cmicastillo.github.io/DES_2016_a_2019.RData")
+
+demog <- des2018_y_2019 %>%
+  select(GEN_ALU,
+         EDUCACION_MADRE,
+         INGRESO_BRUTO_FAM,
+         BENEFICIO_BECA_FSCU,
+         CAE)
+
+demog_sum <- summarytools::dfSummary(demog, 
+                                     plain.ascii = FALSE, 
+                                     varnumbers = FALSE,
+                                     valid.col = FALSE,
+                                     graph.magnif = 0.76)
+summarytools::view(demog_sum, headings = FALSE, method = 'render')
+
+```
+
+#### Deserción permanente según variables académicas
+
+A continuación, se presentará la situación de los desertores en relación con las variables académicas escogidas para el análisis, a saber, el promedio de notas que obtuvieron en su enseñanza media, el puntaje ranking y el puntaje promedio alcanzado en las pruebas PSU de Lenguaje y Matemática. Para ello, se elaboraron dos tablas descriptivas: una que segmenta la información de las tres variables en distintos intervalos, a fin de facilitar la observación de la curva de distribución; y otra en la que, manteniendo la naturaleza continua de las variables, se despliegan algunos estadísticos básicos que no fue posible incorporar en la primera tabla. 
+
+En cuanto al promedio de notas y al puntaje ranking, vinculadas ambas variables a la experiencia académica de los estudiantes previo a su ingreso a la educación superior, se observa una leve inclinación de la curva en torno a los valores medio-bajos. Así, las categorías de mayor frecuencia son, respectivamente, el intervalo entre las notas 5 y 5.5, y el intervalo que comprende todos los puntajes entre los 450 y los 550 puntos. Llama la atención, sin embargo, que la mitad de los desertores haya tenido un desempeño relativamente bueno en ambos aspectos (un promedio de notas superior a 5.6, y un puntaje ranking por sobre los 545 puntos), en tanto se esperaría que dichos estudiantes continuaran, al menos, siendo parte del sistema en su totalidad. Algo similar ocurre al observar la distribución de los puntajes PSU promedio, que, al asumir casi a la perfección la forma de una distribución normal, no permite advertir ninguna tendencia que le sea particular al grupo que abandona permanentemente los estudios superiores. Pese a que estos resultados aparecen como contradictorios a lo planteado en la *H.IV.*, resta aún seguir profundizando en la relación entre esta dimensión y el fenómeno de deserción.
+
+```{r echo=FALSE, results='asis'}
+
+academ <- des2018_y_2019 %>%
+  dplyr::select(PROMEDIO_NOTAS,
+                PTJE_RANKING,
+                PROMLM_ACTUAL)
+
+typeof(academ$PROMEDIO_NOTAS)
+typeof(academ$PTJE_RANKING)
+typeof(academ$PROMLM_ACTUAL)
+
+
+# Character, cambiamos a numeric
+options(digits = 5)
+academ$PROMEDIO_NOTAS <- as.numeric(gsub(",", ".", academ$PROMEDIO_NOTAS))
+academ$PROMLM_ACTUAL <- as.numeric(gsub(",", ".", academ$PROMLM_ACTUAL))
+
+# Crear tramos para todas las variables
+
+academ$PROMEDIO_NOTAS <- cut(academ$PROMEDIO_NOTAS, 
+                             breaks = c(4, 4.5, 5, 5.5, 6, 6.5, 7))
+
+academ$PTJE_RANKING <- cut(academ$PTJE_RANKING,
+                           breaks = c(249, 350, 450, 550, 650, 750, 850))
+
+academ$PROMLM_ACTUAL <- cut(academ$PROMLM_ACTUAL,
+                            breaks = c(149, 250, 350, 450, 550, 650, 750, 850))
+
+
+# dfSummary
+academ_sum <- summarytools::dfSummary(academ, 
+                                     plain.ascii = FALSE, 
+                                     varnumbers = FALSE,
+                                     valid.col = FALSE,
+                                     graph.magnif = 0.76)
+summarytools::view(academ_sum, headings = FALSE, method = 'render')
+
+```
+
+```{r results='asis', echo=FALSE}
+
+academ_1 <- des2018_y_2019 %>%
+  dplyr::select(PROMEDIO_NOTAS,
+                PTJE_RANKING,
+                PROMLM_ACTUAL)
+options(digits = 5)
+academ_1$PROMEDIO_NOTAS <- as.numeric(gsub(",", ".", academ_1$PROMEDIO_NOTAS))
+academ_1$PROMLM_ACTUAL <- as.numeric(gsub(",", ".", academ_1$PROMLM_ACTUAL))
+
+# Labels
+academ_1$PROMEDIO_NOTAS <- sjlabelled::set_label(x = academ_1$PROMEDIO_NOTAS, label = "Promedio de notas")
+academ_1$PTJE_RANKING <- sjlabelled::set_label(x=academ_1$PTJE_RANKING, label = "Puntaje ranking")
+academ_1$PROMLM_ACTUAL <- sjlabelled::set_label(x=academ_1$PROMLM_ACTUAL, label = "Promedio puntajes PSU Lenguaje y Matemática")
+
+
+options(digits = 2)
+sjmisc::descr(academ_1,
+              show = c("label", "mean", "sd", "n", "md"))%>% 
+  kable(.,"markdown")
+
+```
+
+#### Deserción permanente según variables institucionales
+
+Por último, se analizará el grupo de desertores permanentes en función de la dimensión institucional, que comprende, por un lado, la rama educacional -o modalidad- y la dependencia del establecimiento de enseñanza media; y por otro, el tipo de institución de educación superior en que se encontraba matriculado. A fin de apoyar el proceso descriptivo, se incorporó también una segunda tabla, en donde es posible consultar información sobre las mismas variables, pero esta vez en relación con el grupo de desertores hacia el año 2020 (*ver Tabla 6.5.*).
+
+Al respecto, se aprecia que los desertores provienen mayoritariamente de establecimientos de modalidad científico-humanista, en un porcentaje que prácticamente triplica a la proporción procedente del sector técnico-profesional. También, destaca que más del 50% egresó de un establecimiento particular subvencionado, siendo la categoría de  municipal la segunda dependencia más frecuente dentro de este grupo. En comparación con el panorama general de la cohorte, salta a la vista que la fracción de desertores contiene un porcentaje levemente superior de estudiantes provenientes de establecimientos municipales, en contraste con una disminución cercana a los 2 puntos porcentuales en el caso de aquellos procedentes de establecimientos particulares pagados. Además, al consultar las cifras en la segunda tabla, se constata que, en la medida que aumenta el número de desertores permanentes, aumenta también -aunque ligeramente- la proporción proveniente de establecimientos municipales y disminuye la proporción proveniente de establecimientos particulares pagados. Por otra parte, en relación con el tipo de institución de educación superior en que se encontraban matriculados los desertores, la distribución se asemeja bastante a la situación general a nivel cohorte. Sin embargo, nuevamente aparece una tendencia: esta vez, es la proporción de estudiantes de universidades privadas la que presenta una disminución entre los años 2019 y 2020. Otras observaciones que conviene destacar refieren, por ejemplo, al aumento de 3 puntos porcentuales en los desertores de las universidades del G9 del año 2020 por sobre los del 2019, o al incremento y posterior caída en la proporción de desertores provenientes del sector técnico profesional. 
+
+
+```{r results='asis', echo=FALSE}
+
+dim_instit <- des2018_y_2019 %>%
+  dplyr::select(RAMA_EDUCACIONAL,
+                GRUPO_DEPENDENCIA,
+                tipo_inst)
+
+typeof(dim_instit$RAMA_EDUCACIONAL) # character
+typeof(dim_instit$GRUPO_DEPENDENCIA) # double
+typeof(dim_instit$tipo_inst) # double
+
+# To factor
+dim_instit$GRUPO_DEPENDENCIA <- as.factor(dim_instit$GRUPO_DEPENDENCIA)
+dim_instit$tipo_inst <- as.factor(dim_instit$tipo_inst)
+
+# Labels
+dim_instit$GRUPO_DEPENDENCIA <- dplyr::recode(dim_instit$GRUPO_DEPENDENCIA,
+                                  "1"="Municipal",
+                                  "2"="P. Subvencionado",
+                                  "3"="P. Pagado",
+                                  "4"="Corp. de Admin. Delegada")
+
+dim_instit$tipo_inst <- dplyr::recode(dim_instit$tipo_inst,
+                                  "1"="U. Privadas",
+                                  "2"="U. Estatales",
+                                  "3"="U. del G9",
+                                  "4"="CFTs e IPs")
+
+
+# dfSummary
+dim_instit <- summarytools::dfSummary(dim_instit, 
+                                     plain.ascii = FALSE, 
+                                     varnumbers = FALSE,
+                                     valid.col = FALSE,
+                                     graph.magnif = 0.76)
+summarytools::view(dim_instit, headings = FALSE, method = 'render')
+
+```
+
+```{r results='asis', echo=FALSE}
+
+load("C:/Users/hzcat/Desktop/seminario/BBDD/gitbooks/cmicastillo.github.io/DES_2016_a_2020.RData")
+
+des_2 <- des2019_y_2020 %>%
+  dplyr::select(RAMA_EDUCACIONAL,
+                GRUPO_DEPENDENCIA,
+                tipo_inst)
+
+des_2$GRUPO_DEPENDENCIA <- as.factor(des_2$GRUPO_DEPENDENCIA)
+des_2$tipo_inst <- as.factor(des_2$tipo_inst)
+
+# Labels
+des_2$GRUPO_DEPENDENCIA <- dplyr::recode(des_2$GRUPO_DEPENDENCIA,
+                                  "1"="Municipal",
+                                  "2"="P. Subvencionado",
+                                  "3"="P. Pagado",
+                                  "4"="Corp. de Admin. Delegada")
+
+des_2$tipo_inst <- dplyr::recode(des_2$tipo_inst,
+                                  "1"="U. Privadas",
+                                  "2"="U. Estatales",
+                                  "3"="U. del G9",
+                                  "4"="CFTs e IPs")
+
+sum_base <- summarytools::dfSummary(des_2, 
+                                     plain.ascii = FALSE, 
+                                     varnumbers = FALSE,
+                                     valid.col = FALSE,
+                                     graph.magnif = 0.76)
+summarytools::view(sum_base, headings = FALSE, method = 'render')
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

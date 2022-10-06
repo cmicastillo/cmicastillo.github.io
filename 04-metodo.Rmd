@@ -1,0 +1,158 @@
+---
+bibliography: references.bib
+---
+
+# Metodología
+
+```{r load-packages, include=FALSE, echo=FALSE}
+library(magrittr)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+```
+
+## Datos
+
+Para la realización del presente estudio se trabajará con un único set de datos compuesto por una porción de la cohorte de ingresantes del año 2016, el cual fue construido a partir de la recopilación de datos secundarios obtenidos en portales estatales de estadísticas educativas que, a su vez, fueron consolidados a través del identificador único MRUN. Los procesos de limpieza y preparación de estos datos por medio del software RStudio permitieron obtener un total de 180.792 ingresantes como subconjunto para el análisis, de los cuales 50.514 habrían desertado del sistema para el año 2020. A continuación, se presentarán en detalle cada una de las fuentes consultadas y cómo se dará tratamiento a cada información en particular:
+
+### Centro de Estudios MINEDUC (CEM)
+
+Para la construcción de trayectorias educacionales, se utilizaron las bases de datos de matrícula en educación superior entre los años 2016 y 2020 disponibles en la página web del Centro de Estudios Mineduc [CEM] (*s.f.b*), -siendo el Servicio de Información de Educación Superior (SIES)[^1] la entidad proveedora de la información-, y en cuyo sitio web se han recopilado datos estadísticos desde el año 2007 hasta la fecha. A partir de estas bases, es posible extraer información de los estudiantes de gran relevancia para esta investigación, como lo son su género y el tipo de institución y carrera en que se encuentran matriculados. De esta manera, se seleccionó primeramente a los estudiantes que cursaran su primer año el 2016, estuvieran matriculados en algún programa de pregrado y que, además, hubiesen rendido su prueba de admisión el año anterior (2015), para después observar el estado de su matrícula durante los cuatro períodos siguientes.
+
+[^1]: Más información en <https://www.mifuturo.cl/>
+
+En esta misma página web, pero esta vez con el Departamento de Financiamiento Estudiantil como unidad responsable de la entrega de información, se encuentran disponibles las bases de datos sobre asignaciones de becas y créditos estatales que incluyen la gratuidad y el Fondo Solidario de Crédito Universitario (FSCU), y donde se especifica además el año de entrega del beneficio y si se trata de un renovante o si lo obtiene por primera vez. A fin de no complejizar demasiado los análisis de este estudio, se optó por utilizar únicamente el set de datos correspondiente a las asignaciones a estudiantes que obtienen por primera vez un beneficio al año de ingreso al sistema, dejando fuera aquellas asignaciones que beneficiaran a estudiantes de esa misma cohorte durante los años siguientes. Asimismo, dado que solo se cuenta con información relativa a las becas de arancel, se excluyeron las asignaciones de beneficios de mantención, otorgados por la Junta Nacional de Auxilio Escolar y Becas (JUNAEB).
+
+### Comisión Ingresa
+
+Para el caso del Crédito con Garantía Estatal (CAE), es la Comisión Ingresa -la Comisión Administradora del Sistema de Créditos para Estudios Superiores- (*Ingresa, s.f.*) la unidad encargada de su asignación y administración. A través de su portal de estadísticas, la Comisión tiene a disposición del público general las bases de datos sobre asignaciones y renovaciones para cada año en particular, donde también se cuenta con datos más generales sobre el proceso, como la información bancaria asociada a cada estudiante, entre otros. Sin embargo, el identificador usado por esta fuente no es el mismo que el MRUN, de modo que fue necesario solicitar una conversión de los datos para poder efectuar la conexión con el resto de la información a utilizar. Así, la inclusión de este factor en la base final se realizó por medio de la creación de una variable *dummy*, donde el valor 1 representa la asignación de este beneficio.
+
+### Departamento de Evaluación, Medición y Registro Educacional (DEMRE)
+
+Otra de las fuentes consultadas corresponde al Departamento de Evaluación, Medición y Registro Educacional (DEMRE), organismo especializado en administrar el proceso de selección al sistema de educación superior en Chile (DEMRE, s.f.a). Para efectos de la presente investigación, y a modo de robustecer la caracterización de las trayectorias, se utilizaron dos set de datos provistos por esta entidad, cuya información se extrajo directamente a partir de la rendición de la Prueba de Selección Universitaria (PSU) del año 2015 y del posterior proceso de admisión a comienzos del año siguiente. En primer lugar, se contó con un complejo set de información sobre estudiantes inscritos en el proceso, que abarca desde los puntajes obtenidos hasta antecedentes asociados a la experiencia académica durante la enseñanza media, tales como los promedios de notas y la modalidad y dependencia de los establecimientos de origen. En segundo término, se empleó también una base sobre datos socioeconómicos de los estudiantes inscritos, generada a partir de la información autoreportada en las fichas de inscripción a la PSU.
+
+Es importante tener en cuenta, sin embargo, que existen instituciones de educación superior, tanto en el sector universitario como en el técnico profesional, que no exigen la rendición de la PSU en sus procesos de admisión. Pese a ello, se optó de igual forma por considerar solo a aquellos estudiantes que sí la rindieron, ya que contar con información relativa a las dimensiones académica y socioeconómica -a la que únicamente se pudo acceder de manera indirecta a través de la inscripción a la PSU- resulta de particular importancia para los análisis sobre deserción.
+
+Tal como se mencionó en párrafos superiores, se resolvió incorporar en el análisis solamente a los estudiantes inscritos a la rendición de la prueba de admisión el año anterior (2015), pero con independencia del año en que hayan egresado de la enseñanza media, de modo que el análisis incorpora también trayectorias no lineales de ingreso a la educación superior. La unificación de esta información con la base de datos de matriculados en el sistema de educación superior del año siguiente implica la exclusión en los análisis de aquella fracción de inscritos que no figuran como matriculados en alguna institución, así como también a quienes se matricularon en años posteriores a su rendición de la prueba.
+
+En relación con el procesamiento de casos perdidos en las variables de interés, se decidió no imputar valores estimados ni realizar una simple eliminación masiva de filas, tomando en cuenta la alta probabilidad de que dicha ausencia no tenga un origen aleatorio. De este modo, en el caso de la base de inscritos, la eliminación se haría solo en aquellas observaciones en donde no existan valores válidos en todas las variables de interés simultáneamente, cumpliéndose esta condición solo en 382 observaciones. Así, fue posible mantener todos los demás casos con presencia de *missings* en algunas variables -siendo recodificados como *NA* para efectos de los análisis-, lo que se consideró indispensable tomando en cuenta la importancia de estos predictores evidenciada por la literatura [@larroucaudemagalhaes-calvet2013; @miranda2017].
+
+\newpage
+
+## Variables
+
+### Variable dependiente
+
+La identificación de las variables de esta investigación fue realizada siguiendo el modelo propuesto por @blanco2018 sobre trayectorias educacionales, aunque con algunas modificaciones relativas a la clasificación de las mismas. Considerando que en este caso lo que se quiere determinar es la probabilidad de abandonar de forma permanente los estudios superiores, es decir, de dejar de formar parte del sistema en lo absoluto, se torna necesario establecer una distinción entre quienes decidieron permanecer en él, incluyendo con esto a quienes se desplazaron entre carreras e instituciones, y quienes optaron por abandonarlo de manera definitiva durante el primer año. Así, la variable dependiente es la variable de trayectoria, operacionalizada como variable dicotómica a través del seguimiento del estado de la matrícula y del MRUN del estudiante, y se divide en dos grandes caminos posibles:
+
+#### Trayectorias de persistencia
+
+En la *Tabla 1* se detalla la operacionalización de las trayectorias de persistencia. Por un lado, las trayectorias de persistencia continua describen el camino recorrido por aquellos estudiantes que continúan sus estudios sin interrupciones, aunque dada la cantidad de años seleccionados para formar parte del análisis, no se puede establecer una distinción clara entre quienes efectivamente continúan hasta titularse y quienes solo permanecen y no se han titulado. Por otro lado, dentro de las trayectorias de persistencia se encuentran, también, las de reingreso, que comprende todas aquellas trayectorias en donde no se observa una continuidad en el estado de la matrícula. Se estableció un período máximo de 2 años desde su abandono para una posible la reincorporación, de modo que si al tercer año el estudiante aún no figura como matriculado, se considerará como desertor permanente.
+
+A raíz de lo anterior, y con el fin de enriquecer la descripción de las trayectorias, se establecieron distintos niveles de persistencia en función del estado de la matrícula en cada año. Primero, una persistencia más general a nivel de sistema, mediante el seguimiento del MRUN; segundo, una persistencia a nivel de tipo de institución, definida en función de las categorías[^2] a utilizar en esta investigación y observada por medio de la coincidencia tanto de MRUNs como de la variable que clasifica por tipo de institución (*tipo_inst*); y en tercer lugar, una persistencia a nivel de la institución misma, que contempla la coincidencia de MRUNs y de la variable que contiene el código único asignado a cada institución (*cod_inst*). Estos niveles se introdujeron como forma de recategorizar ciertas trayectorias, considerando que un abandono del programa o institución de origen no necesariamente califica como deserción para efectos de este estudio, en tanto estos estudiantes pueden seguir siendo parte del sistema de educación superior.
+
+[^2]: Se presentarán en mayor detalle en el apartado de variables independientes.
+
+```{r, results='asis', echo=FALSE}
+tipo_de_persistencia <- c("Persistencia continua", "Reingreso", "Nivel sistema", "Nivel tipo de institución", "Nivel institución")
+descripción <- c("El estudiante se ha matriculado continuamente desde su ingreso", 
+                 "El estudiante ha abandonado la institución, el tipo de institución o el sistema por un máximo de 2 años",
+                 "El estudiante continúa matriculado en cualquier institución",
+                 "El estudiante continúa matriculado en el mismo tipo de institución (universidades privadas, universidades estatales, universidades del G9, CFTs e IPs)",
+                 "El estudiante continúa matriculado en la misma institución")
+tabla_1 <- data.frame(tipo_de_persistencia, descripción)
+
+tabla_1 %>%
+  knitr::kable("html",
+               caption = "Tabla 1: Variable dependiente - Trayectorias de persistencia",
+               col.names = c("Tipo de persistencia", "Descripción")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, 
+                            position = "center") %>%
+  kableExtra::pack_rows("Niveles de persistencia", 3, 5)
+```
+
+\newpage
+
+#### Trayectorias de abandono permanente
+
+Por su parte, las trayectorias de abandono permanente engloban a todas las observaciones en donde se registre un abandono del sistema de educación superior en su totalidad. A fin de distinguir entre este grupo y quienes abandonan de forma transitoria sus estudios superiores, se estableció, a partir de la revisión de literatura, un período de 3 años para que el estudiante vuelva a matricularse; si al tercer año desde su ingreso no figura como matriculado en ninguna institución ni programa de educación superior, se considera que dicho estudiante abandonó permanentemente el sistema.
+
+### Variables independientes
+
+Para la identificación de las variables independientes, se utilizaron las dimensiones también propuestas por la investigación de @blanco2018, las cuales se condicen con las principales variables registradas por la literatura y comúnmente utilizadas en los estudios sobre deserción. Es necesario señalar que, con el propósito de trabajar únicamente con datos ya disponibles, se dejarán fuera algunas de las variables que componen el modelo de @tinto1975, uno de los modelos empleados con mayor frecuencia en el análisis de la deserción en educación superior, de modo que no se tomarán en cuenta factores asociados al nivel de compromiso de los estudiantes en relación con la institución de la que son parte, como tampoco las experiencias y el nivel de integración social y académica que establecen al interior de dicha institución. Con todo, las dimensiones a tomar en cuenta, con sus respectivas variables, se detallarán en las tablas a continuación:
+
+```{r, results='asis', echo=FALSE}
+Variable <- c("NEM", "Ranking", "Puntaje PSU")
+Descripción <- c("Promedio de notas de enseñanza media", 
+                 "Puntaje estándar asignado al promedio de notas, según establecimiento de egreso",
+                 "Promedio de puntajes PSU de Lenguaje y Matemática")
+Fuente <- c("DEMRE", "DEMRE", "DEMRE")
+dim_acad <- data.frame(Fuente, Variable, Descripción)
+
+dim_acad %>%
+  knitr::kable("html",
+               caption = "Tabla 2: Variables independientes - Dimensión Académica",
+               align = c("c", "l", "l")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+```{r, results='asis', echo=FALSE}
+fuente_2 <- c("DEMRE", "DEMRE", "SIES")
+variable_2 <- c("Modalidad del establecimiento de enseñanza media", "Dependencia del establecimiento de enseñanza media", "Tipo de institución de educación superior")
+operacionalizacion_2 <- c("Humanista científico, Técnico Profesional",
+                        "Municipal=1, Particular Subvencionado=2, Particular Pagado=3, Corporación de Admin. Delegada=4",
+                        "Universidad privada=1, Universidad estatal=2, Universidad del G9=3, CFT e IP=4")
+dim_inst <- data.frame(fuente_2, variable_2, operacionalizacion_2)
+
+dim_inst %>%
+  knitr::kable("html",
+               caption = "Tabla 3: Variables independientes - Dimensión Institucional",
+               align = c("l", "l", "l"),
+               col.names = c("Fuente", "Variable", "Operacionalización")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>% 
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::pack_rows(index = c("De la enseñanza media" = 2, 
+                                  "De la educación superior" = 1))
+```
+
+```{r, results='asis', echo=FALSE}
+fuente_3 <- c("SIES", "DEMRE", "DEMRE", "Depto de Financiamiento Estudiantil y Comisión Ingresa")
+variable_3 <- c("Género", "Nivel educacional de la madre", "Nivel de ingreso familiar", "Tipo de ayuda estatal")
+operacionalizacion_3 <- c("Hombre=1, Mujer=2", 
+                          "Primaria incompleta menos=1, Primaria y secundaria baja=2, Secundaria alta=3, Terciaria ciclo corto=4, Terciaria=5",
+                          "Ingreso bruto por tramo (Ver Anexo I)",
+                          "Beca, crédito y/o gratuidad (Ver Anexo II)")
+dim_soc <- data.frame(fuente_3, variable_3, operacionalizacion_3)
+
+dim_soc %>%
+  knitr::kable("html",
+               caption = "Tabla 4: Variables independientes - Dimensión demográfica y socioeconómica",
+               align = c("l", "l", "l"),
+               col.names = c("Fuente", "Variable", "Operacionalización")) %>%
+  kableExtra::row_spec(0, bold = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+\newpage
+
+## Métodos
+
+Para los resultados descriptivos, se realiza, por un lado, un análisis del estado de matrícula por año de la cohorte de ingreso 2016 para establecer las trayectorias de persistencia y de abandono permanente; y por otro, una exploración de asociaciones bivariadas entre las variables independientes y la dependiente, específicamente de las trayectorias de deserción. Para los resultados predictivos, se desagregan las trayectorias de abandono permanente, operacionalizándolas como variable dicotómica (0 y 1), y se utilizan modelos de regresiones logísticas tanto para identificar los factores de mayor influencia como para determinar el efecto de las ayudas económicas otorgadas por el Estado sobre el fenómeno. Con todo, la descripción del modelo logit es el siguiente:
+
+$$
+log(\frac{p_i}{1-p_i}) = \beta_0 + \beta_1X_iAcadémicas + \beta_2X_iInstitucionales + \beta_3X_iSociodemográficas
+$$
+
+Donde:
+
+-   $log(\frac{p_i}{1-p_i})$ representa el logaritmo de los odds (chances) de abandono permanente de la educación superior.
+
+-   $\beta_0$ representa el intercepto del modelo.
+
+-   $\beta_1X_iAcadémicas$ representa el efecto de las variables explicativas de la dimensión académica agrupadas.
+
+-   $\beta_2X_iInstitucionales$ representa el efecto de las variables explicativas de la dimensión institucional agrupadas.
+
+-   $\beta_3X_iSociodemográficas$ representa el efecto de las variables explicativas de la dimensión sociodemográfica agrupadas.
