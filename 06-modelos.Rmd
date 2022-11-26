@@ -1,0 +1,345 @@
+---
+title: "06-modelos"
+output:
+  html_document: default
+---
+# Resultados predictivos 
+
+```{r load-packages, echo=FALSE, include=FALSE}
+library(magrittr)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(sjlabelled)
+library(sjmisc)
+library(ggpubr)
+library(sjPlot)
+library(gridExtra)
+library(texreg)
+library(summarytools)
+library(ggmosaic)
+library(fastDummies)
+library(finalfit)
+library(epitools)
+```
+
+Con el objetivo de dar respuesta a la pregunta que orienta el desarrollo de esta investigación, así como también de poder contrastar resultados empíricos con las hipótesis propuestas, se elaboraron tablas de contingencia y se estimaron una serie de modelos de regresión logística que asocian la probabilidad de deserción con el conjunto de variables independientes ya mencionadas en los análisis descriptivos. Siguiendo con la lógica que ha dado estructura a todo el escrito hasta ahora, se comenzará con las asociaciones que permitan determinar, primero, la influencia de contar con cualquier forma de ayuda financiera, para luego ahondar en la relación que cada tipo de ayuda por separado establece con la variable dependiente. Luego, se profundizará en la influencia del resto de covariables que, agrupadas según la dimensión con la que se corresponden, se analizarán en los modelos posteriores (ver tablas en Anexos V, VI y VII).  
+
+En la siguiente tabla de contingencia (ver Tabla 6.1.) se observa la distribución de las trayectorias según la asignación de ayuda financiera, siendo cada porcentaje la proporción respecto del total de cada fila (persiste o deserta). A partir de esta información no solo es posible conocer las proporciones de estudiantes que siguieron determinada trayectoria y fueron o no beneficiarios de alguna ayuda económica, sino que, también, el contar con las frecuencias permite calcular los *odds* para cada categoría en relación con las chances de desertar. Así, el resultado de la operación determina un valor de *odds* más pequeño para el conjunto de estudiantes que sí contó con ayudas económicas (0.6758), el cual, al establecer la razón de chances con el grupo que no contó con ayudas (0.9286), indica un odds ratio de 0.73 para los desertores que gozaron de alguna asignación. En términos de probabilidad, esta cifra apunta a una asociación negativa entre contar con una ayuda y la deserción; en otras palabras, el otorgamiento de un beneficio arancelario se relaciona con una menor probabilidad de desertar en comparación con no recibir ningún tipo de apoyo. Pese a que este resultado confirma lo planteado en la H.I. (hipótesis I), la inversión en el cálculo, situando a los no beneficiarios como categoría de referencia, sugiere que la asociación entre ambas variables no parece ser muy fuerte, puesto que los odds de desertar son apenas 1.37 veces más grandes para los estudiantes que no recibieron ninguna ayuda financiera.  
+```{r cross-asig, results='asis', echo=FALSE}
+
+load("C:/Users/hzcat/Desktop/seminario/BBDD/gitbooks/cmicastillo.github.io/trayectorias.RData")
+cohorte_m01 <- base_4 %>%
+  dplyr::select(MRUN,
+                BENEFICIO_BECA_FSCU,
+                CAE,
+                trayectoria)
+# Recodificación de trayectorias. Persistencia=0; Deserción=1
+cohorte_m01$trayectoria <- recode(cohorte_m01$trayectoria,
+                             `1` = 0, `2` = 0, `3` = 1)
+
+
+# Modelos para Hipótesis 1: Contar con una ayuda económica se asocia a una menor probabilidad de desertar 
+
+# Crear dummy dependiendo de si el estudiante recibió o no una ayuda económica
+cohorte_m01 <- cohorte_m01 %>%
+  dplyr::mutate(ayudas = case_when(
+    BENEFICIO_BECA_FSCU == "0" & CAE == 0 ~ 0,
+    BENEFICIO_BECA_FSCU != "0" | CAE == 1 ~ 1
+  ))
+# Recodificaciones
+cohorte_m01$trayectoria <- as_factor(cohorte_m01$trayectoria)
+cohorte_m01$trayectoria <- dplyr::recode(cohorte_m01$trayectoria,
+                                     "0"="Persiste",
+                                     "1"="Deserta")
+cohorte_m01$ayudas <- as_factor(cohorte_m01$ayudas)
+cohorte_m01$ayudas <- dplyr::recode(cohorte_m01$ayudas,
+                                    "0"="No cuenta con ayuda",
+                                    "1"="Cuenta con ayuda")
+# Cross-tabulation
+sjPlot::tab_xtab(var.row = cohorte_m01$trayectoria, 
+                 var.col = cohorte_m01$ayudas, 
+                 title = "Tabla 6.1 Trayectoria según asignación de ayuda financiera", 
+                 show.row.prc = TRUE,
+                 var.labels = c("Trayectoria", "Asignación de ayudas"))
+
+```
+
+En este punto, cabe preguntarse cómo se relaciona cada tipo de ayuda con la probabilidad de desertar, interrogante abordada en la segunda hipótesis de la presente investigación (ver H.II). En ella se plantea, sobre la base de antecedentes empíricos previos, que el ser beneficiario del CAE se asociaría a una menor probabilidad de deserción en comparación con ser beneficiario de la gratuidad. Tomando en consideración los datos desplegados en la Tabla 6.2, y llevando a cabo el mismo procedimiento anterior, se calcula un odds ratio de 0.95 para los desertores que contaron con la ayuda del CAE en el financiamiento de sus estudios. En este sentido, si bien nuevamente se identifica la existencia de una asociación negativa, donde el hecho de contar con este beneficio implicaría una menor probabilidad de deserción al comparar con la gratuidad, se trata de un valor que se aproxima bastante a 1 y, con ello, a una ausencia de relación. Esto se corrobora al invertir la situación: los odds de desertar para quienes contaron con gratuidad son solo 1.1 veces más grandes que los odds de quienes fueron beneficiarios del CAE. Por otra parte, se observa otra relación inesperada al contrastar las cifras de gratuidad con quienes accedieron al FSCU. En este caso, se observa que, para los estudiantes que conforman este último grupo -que accedió al FSCU-, las chances de desertar son 1.28 veces mayores que las de aquellos que contaron con gratuidad. Lo anterior resulta aún más sorpresivo que lo ocurrido al confrontar las categorías CAE-gratuidad, pues se esperaba que el aumento en el compromiso económico de los estudiantes condujera a una menor probabilidad de abandono.
+
+Si bien no se encuentra contenido en las hipótesis, resulta relevante, también, establecer el contraste entre las categorías anteriormente mencionadas y la influencia de las becas en la probabilidad de deserción, sobre todo reparando en que sus beneficiarios constituyen una proporción considerable al interior del grupo de desertores. En relación con los odds de desertar para los estudiantes que únicamente contaron con una beca, se observa que, además de existir una asociación positiva entre ambas variables, las chances de desertar son mayores para este grupo, tanto al comparar con las asignaciones de créditos -por sí solos- y de gratuidad. Los cálculos indican que la mayor disparidad se registra entre los becados y quienes optaron al CAE, teniendo los primeros unas chances de desertar 3.51 veces más grandes que los segundos; 3.36 veces más grandes que quienes fueron beneficiados con gratuidad; y 2.6 veces más grandes que quienes contaron con FSCU. Al incorporar la obligatoriedad de devolución -combinación de becas y créditos-, se aprecia una disminución en el valor del odds ratio en un promedio de 1.82 al comparar con los otros tipos de asignación, existiendo, por lo tanto, una reducción en la probabilidad de desertar. El signo de la asociación se invierte, sin embargo, al calcular los odds de desertar para quienes combinaron becas y CAE en comparación con quienes solo pudieron optar a una beca; en este caso, las chances de desertar entre quienes pertenecen al primer grupo son menores que quienes entran dentro de la segunda categoría, en una razón de chances que se ubica 2.38 veces por debajo. 
+
+```{r cross-tipo, results='asis', echo=FALSE}
+
+# Modelos para Hipótesis 2: Si se confirma Hipótesis 1, ¿cómo influye cada ayuda económica en la probabilidad de desertar? Diferenciación CAE, FSCU, Gratuidad y Becas. 
+cohorte_m02 <- cohorte_m01
+# Si me importa ver gratuidad, ¿esa debería ser mi categoría de referencia? ¿O becas?
+# Orden: becas, gratuidad, fscu, cae. ¿Qué hago con los casos que no presentan ninguna ayuda económica?
+# Junto todas las becas en 1 solo value
+# Crear nueva categoría "Beca + CAE". 
+cohorte_m02 <- cohorte_m02 %>%
+  dplyr::mutate(tipo_ayuda = case_when(
+    BENEFICIO_BECA_FSCU == "BBIC" & CAE == 0 | BENEFICIO_BECA_FSCU == "BEA" & CAE == 0 | BENEFICIO_BECA_FSCU == "BET" & CAE == 0 | BENEFICIO_BECA_FSCU == "BHPE" & CAE == 0 | BENEFICIO_BECA_FSCU == "BJGM" & CAE == 0 | BENEFICIO_BECA_FSCU == "BJGME" & CAE == 0 | BENEFICIO_BECA_FSCU == "BNA" & CAE == 0 | BENEFICIO_BECA_FSCU == "BNM" & CAE == 0 | BENEFICIO_BECA_FSCU == "BNM II" & CAE == 0 | BENEFICIO_BECA_FSCU == "BNM III" & CAE == 0 | BENEFICIO_BECA_FSCU == "BPSU" & CAE == 0 | BENEFICIO_BECA_FSCU == "BVP" & CAE == 0 | BENEFICIO_BECA_FSCU == "TRASPASO" & CAE == 0 ~ 1,
+    BENEFICIO_BECA_FSCU == "BBIC" & CAE == 1 | BENEFICIO_BECA_FSCU == "BEA" & CAE == 1 | BENEFICIO_BECA_FSCU == "BET" & CAE == 1 | BENEFICIO_BECA_FSCU == "BHPE" & CAE == 1 | BENEFICIO_BECA_FSCU == "BJGM" & CAE == 1 | BENEFICIO_BECA_FSCU == "BJGME" & CAE == 1 | BENEFICIO_BECA_FSCU == "BNA" & CAE == 1 | BENEFICIO_BECA_FSCU == "BNM" & CAE == 1 | BENEFICIO_BECA_FSCU == "BNM II" & CAE == 1 | BENEFICIO_BECA_FSCU == "BNM III" & CAE == 1 | BENEFICIO_BECA_FSCU == "BPSU" & CAE == 1 | BENEFICIO_BECA_FSCU == "BVP" & CAE == 1 | BENEFICIO_BECA_FSCU == "TRASPASO" & CAE == 1 ~ 2,
+    BENEFICIO_BECA_FSCU == "GRATUIDAD" ~ 3,
+    BENEFICIO_BECA_FSCU == "FSCU" & CAE == 0 ~ 4,
+    BENEFICIO_BECA_FSCU == "FSCU" & CAE == 1 ~ 5,
+    CAE == 1 ~ 6
+  ))
+cohorte_m02$tipo_ayuda <- as_factor(cohorte_m02$tipo_ayuda)
+# Elimino filas con NA. Quedan 88.317 filas. 
+cohorte_m02 <- cohorte_m02[!is.na(cohorte_m02$tipo_ayuda),]
+# Uso de predictor categórico: 
+# Creamos dummies:
+cohorte_m02 <- fastDummies::dummy_cols(cohorte_m02, select_columns = "tipo_ayuda")
+# Recodificaciones
+cohorte_m02$tipo_ayuda <- as_factor(cohorte_m02$tipo_ayuda)
+cohorte_m02$tipo_ayuda <- dplyr::recode(cohorte_m02$tipo_ayuda,
+                                    "1"="Beca",
+                                    "2"="Beca+CAE",
+                                    "3"="Gratuidad",
+                                    "4"="FSCU",
+                                    "5"="FSCU + CAE",
+                                    "6"="CAE")
+# Cross-tabulation
+sjPlot::tab_xtab(var.row = cohorte_m02$trayectoria, 
+                 var.col = cohorte_m02$tipo_ayuda, 
+                 title = "Tabla 6.2 Trayectoria según tipo de ayuda financiera", 
+                 show.row.prc = TRUE,
+                 var.labels = c("Trayectoria", "Tipo de ayuda"))
+
+```
+
+A continuación, se presentarán los resultados obtenidos a partir de los análisis de regresión, que evalúan la influencia de cada variable independiente sobre la probabilidad de desertar. Como se señaló al inicio de esta sección, las variables fueron agrupadas de acuerdo a la dimensión que les fue aparejada (ver apartado “Variables” en sección “Metodología”). De esta forma, se comenzará con los modelos correspondientes a la dimensión socioeconómica y demográfica, para luego analizar aquellos vinculados a la dimensión académica y, finalmente, los de la dimensión institucional. Las tablas correspondientes se encuentran en el apartado de Anexos (*ver Anexos*). 
+
+En relación con los predictores relacionados con la primera dimensión a analizar, cabe resaltar que todos los coeficientes de las categorías incluidas en la tabla -y la transformación de estos en unidades de odds ratio- apuntan a una asociación positiva con la variable dependiente, implicando que dichas categorías se encuentran más relacionadas con la probabilidad de desertar que aquellas empleadas como referencia. Así, por ejemplo, el Modelo 1, que incorpora la variable sexo y que posiciona a la categoría “mujer” como grupo de referencia, cuenta con un coeficiente que sugiere unas chances de desertar 1.38 veces más grandes para hombres que para mujeres. El Modelo 2 agrega la variable ingreso bruto familiar -que para la estimación de modelos fue reducida a seis categorías, englobando dos tramos cada una-, donde el grupo de referencia correspondió al segmento de más altos ingresos. La observación de los coeficientes para cada categoría deja en evidencia una probabilidad de desertar mayor para los estudiantes que se encuentran en una condición de mayor vulnerabilidad económica, siendo las chances de desertar 2.56 veces más grandes para quienes cuentan con los ingresos más bajos en relación con quienes cuentan con los ingresos más elevados. Una situación similar se advierte al incorporar el nivel educacional de la madre como predictor en el Modelo 4, donde las chances de abandonar los estudios para un estudiante cuya madre no finalizó su enseñanza media son alrededor de 2.5 veces más grandes en comparación a si esta hubiese contado, como mínimo, con una carrera universitaria. Con todo lo anterior, la incorporación de todos los predictores en el Modelo 5 -cuyos coeficientes en unidades de odds-ratio se muestran en la Figura 6.1- permite notar algunas variaciones de interés. Por ejemplo, la distancia de cada categoría de ingreso respecto del grupo de referencia aumenta al mantener el resto de las variables constante, panorama que se invierte en el caso de las categorías educacionales. Por otro lado, el no contar con ayudas económicas, variable ya examinada en detalle anteriormente y que fue incorporada también en el esquema, aumenta considerablemente su capacidad predictiva al controlar por sexo y antecedentes socioeconómicos familiares.  
+
+```{r modelos-socioec, results='asis', echo=FALSE}
+
+cohorte_m03 <- base_4 %>%
+  select(GEN_ALU,
+         tipo_inst,
+         RAMA_EDUCACIONAL,
+         GRUPO_DEPENDENCIA,
+         PROMEDIO_NOTAS,
+         PTJE_RANKING,
+         PROMLM_ACTUAL,
+         INGRESO_BRUTO_FAM,
+         EDUCACION_MADRE,
+         BENEFICIO_BECA_FSCU,
+         CAE,
+         trayectoria)
+cohorte_m03$trayectoria <- recode(cohorte_m03$trayectoria,
+                             `1` = 0, `2` = 0, `3` = 1)
+
+# Primero: solo las variables sociodemográficas
+# Transformar GEN_ALU a dummy! 0 = Mujer; 1 = Hombre
+cohorte_m03$GEN_ALU <- as_factor(cohorte_m03$GEN_ALU)
+cohorte_m03$GEN_ALU <- recode(cohorte_m03$GEN_ALU,
+                             `1` = 1, 
+                             `2` = 0)
+cohorte_m03$trayectoria <- as_factor(cohorte_m03$trayectoria)
+m01 <- glm(trayectoria~GEN_ALU,
+           data = cohorte_m03,
+           family = "binomial")
+
+# Ingreso bruto:
+# Reducción de 12 a 6 tramos/categorías de ingreso:
+cohorte_m03$INGRESO_BRUTO_FAM <- recode(cohorte_m03$INGRESO_BRUTO_FAM,
+                                  `1`= 1, `2`=1, `3`= 2, `4`=2, `5`=3, `6`=3, `7`= 4, `8`=4, `9`= 5, `10`=5, `11`= 6, `12`=6)
+cohorte_m03$INGRESO_BRUTO_FAM <- as_factor(cohorte_m03$INGRESO_BRUTO_FAM) # Factor
+# Creamos dummies:
+cohorte_m03 <- fastDummies::dummy_cols(cohorte_m03, select_columns = "INGRESO_BRUTO_FAM")
+# Estimación modelo:
+m02 <- glm(trayectoria~relevel(INGRESO_BRUTO_FAM, ref = 6),
+           data = cohorte_m03,
+           family = "binomial")
+
+# Cuenta con ayuda financiera:
+cohorte_m03 <- cohorte_m03 %>%
+  dplyr::mutate(ayudas = case_when(
+    BENEFICIO_BECA_FSCU == "0" & CAE == 0 ~ 1,
+    BENEFICIO_BECA_FSCU != "0" | CAE == 1 ~ 0
+  ))
+cohorte_m03$ayudas <- as_factor(cohorte_m03$ayudas)
+m03 <- glm(trayectoria~ayudas,
+           data = cohorte_m03,
+           family = "binomial")
+
+# Educación Madre:
+# ¡Sacar los missings!
+cohorte_m03 <- cohorte_m03[!is.na(cohorte_m03$EDUCACION_MADRE),]
+cohorte_m03$EDUCACION_MADRE <- as_factor(cohorte_m03$EDUCACION_MADRE) # Factor
+# Creamos dummies:
+cohorte_m03 <- fastDummies::dummy_cols(cohorte_m03, 
+                                         select_columns = "EDUCACION_MADRE")
+# Estimación modelo:
+m04 <- glm(trayectoria~relevel(EDUCACION_MADRE, ref = 5),
+           data = cohorte_m03,
+           family = "binomial")
+
+
+# Estimación de modelo con todos los predictores:
+m05 <- glm(trayectoria~GEN_ALU+relevel(INGRESO_BRUTO_FAM, ref = 6)+ayudas+relevel(EDUCACION_MADRE, ref = 5),
+           data = cohorte_m03,
+           family = "binomial")
+```
+
+```{r odds-socioec, results='asis', echo=FALSE, fig.cap='Distribución de coeficientes del Modelo 5 en unidades odds-ratio para dimensión socioeconómica y demográfica'}
+
+sjPlot::plot_model(m05, 
+                   vline.color = "grey",
+                   axis.labels = c("Terciaria Ciclo Corto",
+                                   "Secundaria Alta",
+                                   "Primaria y Secundaria Baja",
+                                   "Primaria Incompleta o menos",
+                                   "No cuenta con ayuda financiera",
+                                   "Ingreso (5)",
+                                   "Ingreso (4)",
+                                   "Ingreso (3)",
+                                   "Ingreso (2)",
+                                   "Ingreso (1)",
+                                   "Hombre"),
+                   title = "Trayectoria (Deserción = 1)") +
+  ggplot2::theme_bw()
+
+```
+
+En contraposición al panorama anterior, los coeficientes de los predictores asociados a la dimensión académica dejan entrever una relación negativa con la probabilidad de abandonar permanentemente los estudios, al menos cuando no se controla por las demás variables. Se constata que el predictor que mayor influencia ejerce sobre la variable dependiente es el promedio de notas con el que los estudiantes egresan de la enseñanza media (Modelo 6), reduciendo en un 14% la probabilidad de desertar con cada décima que aumente dicho promedio; porcentaje que, además, asciende a 16% al controlar por puntajes ranking y PSU. Las variables puntaje ranking y puntaje promedio PSU -modelos 7 y 8, respectivamente- fueron transformadas a través del proceso de reescalado, de forma tal que los coeficientes reflejen el aumento o disminución de probabilidades por cada 50 puntos de variación en los puntajes. Se observa así que, al incorporar todos los predictores en el Modelo 9, la relación entre el puntaje ranking y la probabilidad de deserción cambia de signo, existiendo un incremento de un 17% en dicha probabilidad por cada 50 puntos de aumento en el puntaje. En cuanto al predictor vinculado al puntaje PSU, si bien sigue asociándose negativamente a la variable dependiente, su coeficiente experimenta una leve disminución, habiendo, ya en el Modelo 9 (ver odds-ratio en Figura 6.2., gráfico A), un 28% menos de probabilidad de desertar al aumentar dicho puntaje en 50 puntos.   
+
+Finalmente, los modelos 10, 11, 12 y 13 presentan las variables correspondientes a la dimensión institucional. El primero de ellos incorpora el tipo de institución de educación superior y dispone como grupo de referencia a los estudiantes matriculados en universidades privadas. Al respecto, se advierte que las dos categorías pertenecientes al sector universitario -a saber, las universidades estatales y las del G9- se relacionan negativamente con la probabilidad de deserción, atenuándose dicha probabilidad al pertenecer a cualquiera de estos tipos de institución. Sin embargo, el resultado más interesante se registra en el sector técnico-profesional, donde las chances de desertar para los estudiantes matriculados en CFTs e IPs son alrededor de 7 veces más grandes en comparación con aquellos matriculados en entidades privadas. El modelo 11, que muestra información relativa a la modalidad del establecimiento de origen, revela que las probabilidades de desertar son mayores para quienes egresaron de establecimientos de modalidad T-P, siendo, en concreto, 2.18 veces más grandes al contrastar con los odds de deserción de los establecimientos H-C. Por su parte, el modelo 12 introduce la dependencia del establecimiento como predictor, teniendo como categoría de referencia a los establecimientos particulares pagados. Se aprecia que son los establecimientos con algún tipo de vinculación municipal -municipales y corporaciones de administración delegada- los que más se distancian del grupo de referencia. La inclusión de todas las covariables en el modelo 13 (ver odds-ratio en Figura 6.2., gráfico B) trae como consecuencia reducciones significativas en la fuerza de la asociación entre la variable dependiente y las categorías vinculadas al establecimiento de egreso de los estudiantes. Por ejemplo, se observa una merma de relevancia en los odds de desertar para la modalidad T-P, erigiéndose apenas 1.32 veces por sobre la categoría de referencia. Algo similar ocurre para la variable de dependencia y, específicamente, para las corporaciones de administración delegada, aunque estas variaciones puedan atribuirse a la poca cantidad de estudiantes contenidos en esta categoría.
+
+```{r modelos-acad, results='asis', echo=FALSE}
+cohorte_m04 <- base_4 %>%
+  select(PROMEDIO_NOTAS,
+         PTJE_RANKING,
+         PROMLM_ACTUAL,
+         trayectoria)
+cohorte_m04 <- cohorte_m04[!is.na(cohorte_m04$PROMEDIO_NOTAS),] # 124.932
+cohorte_m04 <- cohorte_m04[!is.na(cohorte_m04$PROMLM_ACTUAL),] # 115.576
+cohorte_m04$trayectoria <- recode(cohorte_m04$trayectoria,
+                             `1` = 0, `2` = 0, `3` = 1)
+
+# Promedio de notas:
+# De comas a puntos:
+options(digits = 5)
+cohorte_m04$PROMEDIO_NOTAS <- as.numeric(gsub(",", ".", cohorte_m04$PROMEDIO_NOTAS))
+# Redondeo
+cohorte_m04$PROMEDIO_NOTAS <- round(cohorte_m04$PROMEDIO_NOTAS, 1)
+# Estimación del modelo:
+m06 <- glm(trayectoria~PROMEDIO_NOTAS,
+           data = cohorte_m04,
+           family = "binomial")
+
+# Puntaje ranking:
+# Re escalar:
+cohorte_m04 <- cohorte_m04 %>%
+  dplyr::mutate(ranking_reescalado = PTJE_RANKING / 50)
+# Redondeo
+cohorte_m04$ranking_reescalado <- round(cohorte_m04$ranking_reescalado, 0)
+# Estimación del modelo:
+m07 <- glm(trayectoria~ranking_reescalado,
+           data = cohorte_m04,
+           family = "binomial")
+
+
+# Promedio puntajes PSU Leng & Matemática (character):
+cohorte_m04$PROMLM_ACTUAL <- as.numeric(gsub(",", ".", cohorte_m04$PROMLM_ACTUAL))
+#Re escalar:
+cohorte_m04 <- cohorte_m04 %>%
+  dplyr::mutate(psu_reescalado = PROMLM_ACTUAL / 50)
+# Redondeo
+cohorte_m04$psu_reescalado <- round(cohorte_m04$psu_reescalado, 0)
+# Estimación del modelo:
+m08 <- glm(trayectoria~psu_reescalado,
+           data = cohorte_m04,
+           family = "binomial")
+
+# Estimación del modelo con todos los predictores:
+m09 <- glm(trayectoria~PROMEDIO_NOTAS+ranking_reescalado+psu_reescalado,
+           data = cohorte_m04,
+           family = "binomial")
+```
+
+
+```{r modelos-inst, results='asis', echo=FALSE}
+cohorte_m05 <- base_4 %>%
+  select(tipo_inst,
+         RAMA_EDUCACIONAL,
+         GRUPO_DEPENDENCIA,
+         trayectoria)
+cohorte_m05$trayectoria <- recode(cohorte_m05$trayectoria,
+                             `1` = 0, `2` = 0, `3` = 1)
+cohorte_m05 <- cohorte_m05[!is.na(cohorte_m05$RAMA_EDUCACIONAL),] # 124.251 casos
+
+# Tipo de institución:
+cohorte_m05$tipo_inst <- as_factor(cohorte_m05$tipo_inst) # Factor
+# Creamos dummies:
+cohorte_m05 <- fastDummies::dummy_cols(cohorte_m05, select_columns = "tipo_inst")
+# Estimación del modelo:
+m10 <- glm(trayectoria~tipo_inst_2+tipo_inst_3+tipo_inst_4,
+           data = cohorte_m05,
+           family = "binomial")
+
+# Rama educacional:
+# Volverla dummy: T-P=1; H-C=0
+cohorte_m05 <- cohorte_m05 %>% 
+  mutate(RAMA_EDUCACIONAL = if_else(RAMA_EDUCACIONAL=="TECNICO PROFESIONAL", 1, 0))
+cohorte_m05$RAMA_EDUCACIONAL <- as_factor(cohorte_m05$RAMA_EDUCACIONAL) # Factor
+# Estimación del modelo:
+m11 <- glm(trayectoria~RAMA_EDUCACIONAL,
+           data = cohorte_m05,
+           family = "binomial")
+
+# Grupo dependencia: 
+cohorte_m05$GRUPO_DEPENDENCIA <- as_factor(cohorte_m05$GRUPO_DEPENDENCIA) # Factor
+# Creamos dummies:
+cohorte_m05 <- fastDummies::dummy_cols(cohorte_m05, 
+                                       select_columns = "GRUPO_DEPENDENCIA")
+# Estimación modelo:
+m12 <- glm(trayectoria~relevel(GRUPO_DEPENDENCIA, ref = 3),
+           data = cohorte_m05,
+           family = "binomial")
+
+
+# Estimación de modelo con todos los predictores:
+m13 <- glm(trayectoria~tipo_inst_2+tipo_inst_3+tipo_inst_4+RAMA_EDUCACIONAL+relevel(GRUPO_DEPENDENCIA, ref = 3),
+           data = cohorte_m05,
+           family = "binomial")
+```
+
+
+```{r grid-odds, results='asis', echo=FALSE, fig.align='center', fig.cap='Distribución de coeficientes de los Modelos 9 y 13 en unidades odds-ratio para dimensiones académica e institucional'}
+
+plot_academicas <- sjPlot::plot_model(m09, 
+                   vline.color = "grey",
+                   axis.labels = c("Promedio puntajes PSU Lenguaje y Matemática (por cada 50 ptos)", "Puntaje Ranking (por cada 50 ptos)", "Promedio de notas"),
+                   title = "Trayectoria") + 
+  ggplot2::theme_bw()
+
+
+plot_institucionales <- sjPlot::plot_model(m13, 
+                   vline.color = "grey",
+                   axis.labels = c("Corp. de Admin. Delegada", "P. Subvencionado", "Municipal", "Modalidad T-P", "CFTs e IPs", "U. del G9", "U. Estatales"),
+                   title = "Trayectoria") +
+  ggplot2::theme_bw()
+
+cowplot::plot_grid(plot_academicas, NULL, NULL, plot_institucionales,
+                   labels = c("A", " ", " ", "B"),
+                   align = "v",
+                   nrow = 2) 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
