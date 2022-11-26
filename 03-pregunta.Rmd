@@ -1,0 +1,43 @@
+# Pregunta, objetivos e hipótesis
+
+## Pregunta de investigación
+
+¿En qué medida las ayudas económicas otorgadas por el Estado influyen en la probabilidad de abandonar permanentemente los estudios superiores en estudiantes de la cohorte de ingreso 2016 matriculados en los distintos tipos de institución de educación superior existentes en Chile?
+
+## Objetivo general de investigación
+
+Conocer el efecto de las ayudas económicas otorgadas por el Estado sobre la probabilidad de abandonar permanentemente los estudios superiores en estudiantes de la cohorte de ingreso 2016 matriculados en los distintos tipos de institución de educación superior existentes en Chile.  
+
+## Objetivos específicos
+
+-   Clasificar a los estudiantes de la cohorte de ingreso 2016 en función de sus diferentes trayectorias[^2] al interior del sistema de educación superior.
+
+-   Describir la distribución de los estudiantes en función de las dimensiones[^3] identificadas.
+
+-   Determinar la influencia de las variables explicativas asociadas a las distintas dimensiones sobre la probabilidad de abandonar permanentemente los estudios superiores.
+
+-   Determinar la influencia de cada tipo de beneficio otorgado por el Estado -becas, créditos y gratuidad- sobre la probabilidad de abandonar permanentemente los estudios superiores.
+
+[^2]: Se explicará lo que se entiende por trayectoria en el apartado metodológico.
+
+[^3]: Se ahondará en la pormenorización de estas dimensiones en el apartado metodológico.
+
+## Hipótesis 
+
+**H.I.** Los estudiantes beneficiados con alguna ayuda económica otorgada por el Estado cuentan con una menor probabilidad de abandonar permanentemente sus estudios superiores.
+
+**H.II.** Los estudiantes beneficiarios del CAE presentan una menor probabilidad de abandonar permanentemente sus estudios superiores en comparación con aquellos beneficiados con el FSCU y la gratuidad.
+
+**H.III.** Las variables asociadas a la dimensión socioeconómica son las que tienen una mayor influencia en la probabilidad de abandonar permanentemente los estudios superiores en comparación con las dimensiones académica e institucional.
+
+**H.IV.** Los estudiantes con mejor rendimiento en la dimensión académica presentan una menor probabilidad de abandonar permanentemente sus estudios superiores.
+
+
+```{r plotsaved, echo=FALSE, fig.cap="Diagrama de hipótesis", fig.align='center', out.width='75%'}
+knitr::include_graphics("Diagrama de hipótesis.drawio.png")
+```
+
+
+
+
+

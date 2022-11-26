@@ -1,0 +1,37 @@
+---
+title: 'Factores determinantes de las trayectorias de deserción permanente en educación superior: El efecto de las ayudas financieras estatales y la política de gratuidad'
+subtitle: "Memoria para optar al título profesional de Socióloga"
+author: "Catalina F. Miranda Castillo"
+date: "Noviembre, 2022" # o para fecha actual: "`r Sys.Date()`"
+institution: "Universidad de Chile"
+degree: "Memoria de Título - Carrera de Sociología"
+advisor: "Profesor guía: Juan C. Castillo V."
+bibliography: [tesis.bib]
+biblio-style: apalike
+link-citations: yes
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+fontsize: 14pt
+lof: True
+lot: True
+
+---
+
+
+# Resumen {-}
+
+El sistema de educación superior chileno ha experimentado profundas transformaciones durante las últimas décadas. Una de ellas ha sido la considerable expansión en términos de cobertura, en gran parte posibilitada por la ampliación y diversificación de las ayudas financieras -becas y créditos- provistas por parte del Estado. Sin embargo, los avances en materia de acceso no vinieron acompañados de la generación de condiciones que favorezcan la retención y la permanencia, persistiendo aún elevadas tasas de deserción en el sistema. En este escenario, la presente investigación se centró en las trayectorias académicas de los estudiantes pertenecientes a la cohorte de ingreso del año 2016, con el fin de indagar en la influencia que las ayudas financieras estatales anteriormente mencionadas -en particular la reciente política de gratuidad- tienen sobre la probabilidad de abandonar permanentemente los estudios superiores. Como hipótesis principales, se planteó que: i) contar con ayudas financieras se asociaría con una menor probabilidad de desertar; y ii) los estudiantes beneficiados con el Crédito con Garantía Estatal (CAE) presentarían una menor probabilidad de desertar en comparación con aquellos beneficiarios de la gratuidad, así como también con quienes cuentan con el Fondo Solidario de Crédito Universitario (FSCU). A partir de datos provenientes de diversas fuentes estadísticas de educación superior de organismos estatales entre los años 2016 y 2020, se clasificó a los estudiantes en función de sus trayectorias académicas y se construyeron tablas de contingencia y modelos de regresiones logísticas para evaluar el efecto que las diferentes ayudas económicas tienen sobre la probabilidad de ocurrencia del fenómeno. Los resultados indican que los beneficiarios de ayudas financieras efectivamente contaron con una menor probabilidad de abandonar los estudios, y pese a que quienes contaron con CAE también presentaron una menor probabilidad de deserción en comparación con quienes accedieron a gratuidad, esta diferencia no fue demasiado significativa. Se identificó, también, que la probabilidad de deserción disminuyó entre quienes combinaron becas y créditos en contraposición a quienes solo contaron con una beca, demostrando que un aumento en el compromiso económico incide en una menor probabilidad de abandono. 
+  
+**Palabras clave**: deserción, trayectorias, educación superior, ayudas financieras estatales, gratuidad
+
+
+# Agradecimientos {-}
+
+No podría comenzar mis agradecimientos sin mencionar primero a mi familia. A mi madre, Rosa, por depositar su confianza en mí desde el primer día y por acompañarme en cada paso que di en este tobogán de emociones que ha significado mi paso por la universidad. A mi hermana Camila y a mi tío Cristian, que todos estos años han prestado oído a mis desahogos en tantos almuerzos y onces, y que siempre han estado allí para mí a pesar de encontrarse ellos mismos en momentos complicados. Quisiera agradecer especialmente a mi tata Juan, por ser mi primer profesor y por haber despertado a tan temprana edad mi interés por el mundo; y a mi yeya Adela, quien con su infinita preocupación y cariño logró acortar, por medio de nuestras entrañables llamadas telefónicas, los más de 1.400 kilómetros que separan a Santiago de mi queridísima tierra de campeones.
+
+Con profundo amor agradezco a mi compañero Lucas, por alegrar mis días, por sostener mi mano en las buenas, en las malas y en las peores, y por tantas otras cosas que solo él y yo podríamos entender. Agradecer también a mis amigos: Jorge Leiva, Javiera Wömpner, Lucas Martin, Simón France, Salvador Mersey, Sebastián Estenssoro, José Gálvez y a tantos otros que han tenido una presencia más efímera, pero no por ello menos importante, en mi vida universitaria. Mis gratitudes también para Jorge Fuentealba, por nuestras jornadas maratónicas de escritura y eternas conversaciones que, últimamente, han amenizado tanto este final de camino. 
+
+A mi estimada casa de estudios, la Universidad de Chile, por cultivar mi espíritu y expandir mi visión de mundo, ayudándome con ello a encontrar mi lugar en esta vida. A mis profesores, quienes con su sabiduría y pasión me han recordado constantemente, a lo largo de estos cinco años, por qué elegí adentrarme en el maravilloso terreno de las ciencias sociales. Agradezco también a mi profesor guía, Juan Castillo, por poner a disposición sus conocimientos metodológicos y disciplinares y, sobre todo, por calmar mi ansiedad cada vez que el trabajo investigativo se puso cuesta arriba.   
+
+Finalmente, quisiera agradecer a las instituciones que me proporcionaron la información necesaria para llevar a cabo los análisis aquí presentes. Se agradece al Departamento de Evaluación, Medición y Registro Educacional (DEMRE) de la Universidad de Chile, por facilitar las bases de datos del Sistema de Admisión a la Educación Superior Universitaria para el desarrollo de esta investigación. Al Sr. Rodrigo Hernández Garrido, Jefe del Departamento de Presupuesto y Análisis Financiero de la Comisión Ingresa, por su amabilidad y buena disposición para realizar, en tiempo récord, la reconversión de datos que salvaría a mi proyecto de caer en la inviabilidad. A todos los portales de datos abiertos y a todas las fuentes consultadas, muchas gracias por hacer posible el desarrollo de esta memoria de título.  
